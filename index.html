@@ -23,7 +23,7 @@ a{color:var(--accent-ink)}
 .demo-banner{background:var(--ink);color:#FDFDFB;font-size:12.5px;padding:7px 16px;text-align:center}
 .demo-banner b{color:#8FD4D8}
 /* ── Hero ── */
-.hero{max-width:1020px;margin:0 auto;padding:52px 24px 6px;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hero{max-width:1020px;margin:0 auto;padding:44px 24px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap}
 .hero .mark{width:56px;height:56px;flex:none}
 .hero h1{font-size:28px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em}
 .hero p{margin:4px 0 0;color:var(--ink-3);font-size:15px;max-width:560px}
@@ -31,7 +31,15 @@ a{color:var(--accent-ink)}
 .chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-3);background:var(--surface)}
 .chip b{color:var(--accent-ink);font-weight:650}
 /* ── 应用壳 ── */
-.shell{margin:30px 0 0;padding:0;display:grid;grid-template-columns:200px 1fr;gap:0;
+.shots{max-width:1020px;margin:26px auto 0;padding:0 24px}
+.shots-label{font-size:12px;font-weight:650;color:var(--ink-4);letter-spacing:.14em}
+.shots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.shots figure{margin:0}
+.shots img{width:100%;display:block;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow)}
+.shots figcaption{font-size:12px;color:var(--ink-4);margin-top:6px;text-align:center}
+.play-label{max-width:1020px;margin:30px auto 10px;padding:0 24px;font-size:12px;font-weight:650;color:var(--ink-4);letter-spacing:.14em;display:flex;justify-content:space-between;align-items:baseline}
+.play-label span{font-weight:400;letter-spacing:0;border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.shell{margin:0;padding:0;display:grid;grid-template-columns:200px 1fr;gap:0;
   background:var(--surface);border-top:1px solid var(--line);min-height:640px}
 .side{background:var(--surface-ink);border-right:1px solid var(--line-soft);padding:16px 10px 12px;display:flex;flex-direction:column;gap:2px}
 .brand{display:flex;gap:10px;align-items:center;padding:2px 8px 12px}
@@ -126,17 +134,15 @@ dialog::backdrop{background:rgba(32,42,48,.35)}
 .arch pre{background:var(--ink);color:#C9E4E5;border-radius:14px;padding:20px 24px;font-size:12.5px;line-height:1.7;overflow:auto;margin:0}
 footer{max-width:1180px;margin:26px auto 60px;padding:0 24px;font-size:12.5px;color:var(--ink-4);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
 kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;background:var(--surface-ink)}
-@media(max-width:860px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;align-items:center}.nav{flex-direction:row}.side input,.side .foot{display:none}.main{padding:16px}}
+@media(max-width:860px){.shots-grid{grid-template-columns:1fr}.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;align-items:center}.nav{flex-direction:row}.side input,.side .foot{display:none}.main{padding:16px}}
 </style>
 </head>
 <body>
-<div class="demo-banner"><b>交互演示</b> · 演示数据 · 真实系统本地优先 · 永不自动发布</div>
 
 <div class="hero">
   <svg class="mark" viewBox="0 0 48 48"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D8F92"/><stop offset="1" stop-color="#0F4A4B"/></linearGradient></defs><rect x="1" y="1" width="46" height="46" rx="12" fill="url(#g)"/><path d="M14 16 H34 L14 32 H34" fill="none" stroke="#FDFDFB" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="16" r="2.4" fill="#FDFDFB"/><circle cx="34" cy="32" r="3.6" fill="#FDFDFB"/></svg>
   <div>
     <h1>Zento AI自媒体工作台</h1>
-    <p>一条内容单，贯穿 选题 → 证据 → 成稿 → 门禁 → 发布。每条事实挂证据链；门禁不过，发布按钮置灰。</p>
   </div>
   <div class="chips">
     <span class="chip"><b>306</b> 项回归测试</span>
@@ -146,6 +152,16 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
   </div>
 </div>
 
+<div class="shots">
+  <span class="shots-label">真实系统</span>
+  <div class="shots-grid">
+    <figure><img src="shot-home.png" alt="今日行动：简报与行动队列" loading="lazy"><figcaption>今日行动</figcaption></figure>
+    <figure><img src="shot-order.png" alt="内容单详情：证据链与四段门禁" loading="lazy"><figcaption>内容单 · 证据链与门禁</figcaption></figure>
+    <figure><img src="shot-intel.png" alt="情报研究：选题评审" loading="lazy"><figcaption>情报 · 选题评审</figcaption></figure>
+  </div>
+</div>
+
+<div class="play-label">在线交互 <span>演示数据</span></div>
 <div class="shell">
   <aside class="side">
     <div class="brand">
@@ -179,15 +195,7 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
 </div>
 
 <!-- 特性区 -->
-<div class="feats">
-  <div class="feat"><h3>四段发布门禁</h3><p>事实 · 口径 · 语言 · 发布——不过，返回 409。</p></div>
-  <div class="feat"><h3>情报引擎</h3><p>86 个分级信源，评分改动必须先过回测。</p></div>
-  <div class="feat"><h3>工程纪律</h3><p>306 项回归 · 每日备份演练 · AI 只做到待审。</p></div>
-</div>
-
-<footer>
-  <span>设计 tokens 冻结</span><span>·</span><span>数据不出本机</span><span>·</span><span>按 <kbd>⌘K</kbd> 唤起命令面板</span>
-</footer>
+<footer><span>演示数据 · 真实系统本地优先</span><span>·</span><span>按 <kbd>⌘K</kbd> 唤起命令面板</span></footer>
 
 <div id="ck"><div class="bd" onclick="CK.open(false)"></div><div class="pn"><input id="cki" placeholder="输入命令或搜索…  ↑↓ 选择 · Enter 执行"><div class="ls" id="ckl"></div></div></div>
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
