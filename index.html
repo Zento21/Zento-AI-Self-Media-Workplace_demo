@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zento · 具身智能自媒体工作台 · 交互演示</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%231D8F92'/%3E%3Cstop offset='1' stop-color='%230F4A4B'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='1' y='1' width='46' height='46' rx='12' fill='url(%23g)'/%3E%3Cpath d='M14 16 H34 L14 32 H34' fill='none' stroke='%23FDFDFB' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='14' cy='16' r='2.4' fill='%23FDFDFB'/%3E%3Ccircle cx='34' cy='32' r='3.6' fill='%23FDFDFB'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#FAF9F6; --surface:#FFFFFF; --surface-ink:#F3F3EF;
+  --ink:#202A30; --ink-2:#303C42; --ink-3:#59656B; --ink-4:#657176;
+  --line:#DFE4E1; --line-soft:#E9EDE9;
+  --accent:#176B75; --accent-ink:#145F68; --accent-soft:rgba(23,107,117,.09);
+  --success:#2F7D5C; --warning:#B8873A; --danger:#B3402A;
+  --shadow:0 1px 2px rgba(32,42,48,.05); --shadow-hover:0 3px 12px rgba(32,42,48,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.5 system-ui,-apple-system,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  font-variant-numeric:tabular-nums}
+a{color:var(--accent-ink)}
+/* ── 演示横幅 ── */
+.demo-banner{background:var(--ink);color:#FDFDFB;font-size:12.5px;padding:7px 16px;text-align:center}
+.demo-banner b{color:#8FD4D8}
+/* ── Hero ── */
+.hero{max-width:1180px;margin:0 auto;padding:36px 24px 10px;display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.hero .mark{width:56px;height:56px;flex:none}
+.hero h1{font-size:26px;font-weight:700;margin:0 0 6px;letter-spacing:-.01em}
+.hero p{margin:0;color:var(--ink-3);font-size:14.5px;max-width:640px}
+.hero .chips{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-content:flex-start}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-3);background:var(--surface)}
+.chip b{color:var(--accent-ink);font-weight:650}
+/* ── 应用壳 ── */
+.shell{max-width:1180px;margin:22px auto 0;padding:0 24px;display:grid;grid-template-columns:200px 1fr;gap:0;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-hover);min-height:620px}
+.side{background:var(--surface-ink);border-right:1px solid var(--line-soft);padding:16px 10px 12px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;gap:10px;align-items:center;padding:2px 8px 12px}
+.brand .mark{width:30px;height:30px;flex:none}
+.brand strong{font-size:14.5px;display:block}
+.brand span{font-size:11.5px;color:var(--ink-4)}
+.side input{margin:0 2px 12px;padding:7px 10px;border:1px solid transparent;border-radius:10px;background:var(--surface);
+  font:inherit;font-size:12.5px;color:var(--ink);outline:none;width:100%}
+.side input:focus{border-color:var(--accent)}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:9px;padding:7px 10px;border:none;background:none;border-radius:9px;
+  color:var(--ink-3);font:inherit;font-size:13px;cursor:pointer;text-align:left;transition:all .16s ease-out}
+.nav button:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.nav button.on{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.nav svg{width:15px;height:15px;flex:none}
+.side .foot{margin-top:auto;font-size:11px;color:var(--ink-4);padding:8px}
+.main{padding:20px 22px 26px;min-width:0}
+.view{display:none}.view.on{display:block}
+.vtitle{font-size:17px;font-weight:650;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.vtitle .n{font-size:11.5px;font-weight:400;color:var(--ink-4);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+/* 简报卡 */
+.brief-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-bottom:20px}
+.brief-sec{background:var(--surface-ink);border-radius:12px;padding:10px 12px}
+.brief-sec h4{margin:0 0 2px;font-size:12px;color:var(--ink-3);font-weight:600}
+.brief-item{display:flex;gap:7px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;line-height:1.4}
+.brief-item:last-child{border:none}
+.brief-item b{color:var(--accent);min-width:18px;text-align:right}
+/* 流水线 pills */
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pill{font-size:12px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--ink-3);background:var(--surface);cursor:pointer;transition:all .16s ease-out}
+.pill:hover{border-color:var(--accent);color:var(--accent-ink)}
+.pill.on{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink);font-weight:600}
+.pill b{font-family:ui-monospace,'SF Mono',Menlo,monospace}
+/* 卡片 */
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px;box-shadow:var(--shadow);transition:all .16s ease-out;cursor:pointer}
+.qcard:hover{transform:translateY(-1px);box-shadow:var(--shadow-hover)}
+.qmeta{display:flex;gap:7px;align-items:center;font-size:11.5px;color:var(--ink-4);margin-bottom:3px;flex-wrap:wrap}
+.badge{font-size:10.5px;padding:1.5px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.badge.ok{background:rgba(47,125,92,.12);color:var(--success)}
+.badge.warn{background:rgba(184,135,58,.13);color:#7C5A24}
+.qtitle{font-size:14px;font-weight:650;margin:0 0 4px;line-height:1.4}
+.qdesc{font-size:12.5px;color:var(--ink-3)}
+.qacts{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+.btn{font:inherit;font-size:12.5px;padding:5px 13px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .16s ease-out}
+.btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.btn.pri:hover{background:var(--accent-ink)}
+/* 候选评审 */
+.cand{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;transition:all .16s ease-out}
+.cout{opacity:.35}
+.cand .qtitle{font-size:13.5px}
+/* 弹层 */
+dialog{border:1px solid var(--line);border-radius:16px;padding:0;background:var(--surface);color:var(--ink);width:min(620px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(32,42,48,.35)}
+.dlg{padding:20px 22px}
+.dlg h3{margin:0 0 2px;font-size:15.5px}
+.tl{border-left:2px solid var(--line);padding-left:14px;display:grid;gap:7px;margin:8px 0 14px}
+.tl .s{position:relative;font-size:12.5px;color:var(--ink-3)}
+.tl .s::before{content:'';position:absolute;left:-19px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+.claim{display:flex;gap:8px;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;align-items:baseline}
+.claim .ev{flex:none}
+.claim .ev a{font-size:11.5px;text-decoration:none}
+.gates{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 14px}
+.gate{border:1px solid var(--line);border-radius:10px;padding:7px 9px;font-size:11.5px}
+.gate b{display:block;font-size:12px;margin-bottom:2px}
+.gate.pass{border-color:rgba(47,125,92,.35);background:rgba(47,125,92,.07)}
+.gate.fail{border-color:rgba(179,64,42,.35);background:rgba(179,64,42,.06)}
+.gate.pass b{color:var(--success)}.gate.fail b{color:var(--danger)}
+.station{background:var(--surface-ink);border-radius:10px;padding:9px 12px;font-size:12px;color:var(--ink-3);line-height:1.7;margin-bottom:14px}
+.station b{color:var(--accent-ink)}
+/* ⌘K */
+#ck{position:fixed;inset:0;z-index:50;display:none}
+#ck.open{display:block}
+#ck .bd{position:absolute;inset:0;background:rgba(32,42,48,.32)}
+#ck .pn{position:relative;margin:12vh auto 0;width:min(560px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 32px rgba(28,39,51,.14);overflow:hidden}
+#ck input{width:100%;border:none;outline:none;padding:14px 16px;font-size:15px;font-family:inherit;color:var(--ink);background:transparent}
+#ck .ls{max-height:46vh;overflow:auto;border-top:1px solid var(--line-soft)}
+.ci{display:flex;align-items:center;gap:10px;padding:9px 14px;font-size:13.5px;cursor:pointer}
+.ci.sel{background:var(--accent-soft)}
+.ci .k{margin-left:auto;font-size:11px;color:var(--ink-4);border:1px solid var(--line);border-radius:999px;padding:1px 8px;flex:none}
+/* 特性区 */
+.feats{max-width:1180px;margin:34px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.feat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+.feat h3{margin:0 0 8px;font-size:15px}
+.feat p{margin:0;font-size:13px;color:var(--ink-3);line-height:1.7}
+.feat .num{font-size:26px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.arch{max-width:1180px;margin:14px auto 0;padding:0 24px}
+.arch pre{background:var(--ink);color:#C9E4E5;border-radius:14px;padding:20px 24px;font-size:12.5px;line-height:1.7;overflow:auto;margin:0}
+footer{max-width:1180px;margin:26px auto 60px;padding:0 24px;font-size:12.5px;color:var(--ink-4);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;background:var(--surface-ink)}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;align-items:center}.nav{flex-direction:row}.side input,.side .foot{display:none}.main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="demo-banner">交互演示 · 全部为<b>演示数据</b> · 真实系统为本地优先的 Flask + SQLite 应用，发布环节始终由人执行</div>
+
+<div class="hero">
+  <svg class="mark" viewBox="0 0 48 48"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D8F92"/><stop offset="1" stop-color="#0F4A4B"/></linearGradient></defs><rect x="1" y="1" width="46" height="46" rx="12" fill="url(#g)"/><path d="M14 16 H34 L14 32 H34" fill="none" stroke="#FDFDFB" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="16" r="2.4" fill="#FDFDFB"/><circle cx="34" cy="32" r="3.6" fill="#FDFDFB"/></svg>
+  <div>
+    <h1>Zento · 具身智能自媒体工作台</h1>
+    <p>面向具身智能 / AI 办公方向创作者的一体化内容生产系统。一条「内容单」贯穿 <b>选题 → 证据 → 成稿 → 门禁 → 发布 → 复盘</b>，每条对外事实挂证据链，四段门禁不过则发布按钮置灰——用工程方法管内容质量。</p>
+  </div>
+  <div class="chips">
+    <span class="chip"><b>306</b> 项回归测试</span>
+    <span class="chip"><b>86</b> 个分级信源</span>
+    <span class="chip"><b>10</b> 阶段流水线</span>
+    <span class="chip"><b>0</b> 次 LLM 的每日日报</span>
+  </div>
+</div>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 48 48"><rect x="1" y="1" width="46" height="46" rx="12" fill="url(#g)"/><path d="M14 16 H34 L14 32 H34" fill="none" stroke="#FDFDFB" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="16" r="2.4" fill="#FDFDFB"/><circle cx="34" cy="32" r="3.6" fill="#FDFDFB"/></svg>
+      <div><strong>Zento</strong><span>具身智能工作台</span></div>
+    </div>
+    <input placeholder="搜索…  ⌘K" readonly onfocus="CK.open(true)">
+    <nav class="nav" id="nav"></nav>
+    <div class="foot">本地服务 · 数据不出本机</div>
+  </aside>
+  <main class="main">
+    <!-- 今日行动 -->
+    <section class="view on" id="v-home">
+      <h2 class="vtitle">今日简报 <span class="n">情报引擎 · 零 LLM 生成</span></h2>
+      <div class="brief-grid" id="brief"></div>
+      <h2 class="vtitle">行动队列 <span class="n">只显示需要人决策的事</span></h2>
+      <div class="qgrid" id="queue"></div>
+    </section>
+    <!-- 内容生产 -->
+    <section class="view" id="v-orders">
+      <h2 class="vtitle">内容单流水线 <span class="n">一条单贯穿 选题→发表 · 点击卡片看详情</span></h2>
+      <div class="pills" id="pills"></div>
+      <div class="qgrid" id="orders"></div>
+    </section>
+    <!-- 情报研究 -->
+    <section class="view" id="v-intel">
+      <h2 class="vtitle">情报 · 选题评审 <span class="n">批准后才抓正文、生成草稿</span></h2>
+      <div id="cands"></div>
+    </section>
+  </main>
+</div>
+
+<!-- 特性区 -->
+<div class="feats">
+  <div class="feat"><span class="num">A·B·C·D</span><h3>四段发布门禁</h3><p>事实核验（每条对外事实挂证据链接与正文快照）→ 口径一致性 → 语言审查（humanizer 反模式规则）→ 发布检查。A/D 不过，发布接口直接返回 409——质量门禁是系统行为，不靠自觉。</p></div>
+  <div class="feat"><span class="num">86 源 · 三级</span><h3>情报引擎与回测纪律</h3><p>T1 官方一手 / T1.5 官方社媒 / T2 媒体，便宜模型预筛 → 强模型只打维度分 → 代码公式合成总分。任何评分改动必须先在人工标注评估集上回测，胜出才允许上线。</p></div>
+  <div class="feat"><span class="num">306 项</span><h3>工程纪律</h3><p>回归测试覆盖前端契约、状态机流转、门禁拦截、评分函数；每日自动备份 + 只读恢复演练；单据只归档不删除；发布动作永远留给人——AI 只做到「待审」。</p></div>
+</div>
+<div class="arch"><pre>浏览器（单文件应用 · 冻结设计 tokens）
+   │  HTTP 127.0.0.1:5199 —— 数据不出本机
+Flask + Waitress（server.py）
+   │
+SQLite（30+ 表）
+   ├─ rss_sources / rss_items       情报库（分级信源）
+   ├─ research_candidates           选题候选（v1/v2 双评分并行）
+   ├─ content_orders/claims         内容单 + 证据链（正文快照）
+   ├─ work_items                    行动队列（三个人工点）
+   └─ draft_packages                版本化草稿包</pre></div>
+
+<footer>
+  <span>Zento · 具身智能工作台 · 交互演示</span><span>·</span>
+  <span>设计 tokens 冻结于 <kbd>tokens.json</kbd></span><span>·</span>
+  <span>按 <kbd>⌘K</kbd> 或 <kbd>Ctrl K</kbd> 体验命令面板</span>
+</footer>
+
+<div id="ck"><div class="bd" onclick="CK.open(false)"></div><div class="pn"><input id="cki" placeholder="输入命令或搜索…  ↑↓ 选择 · Enter 执行"><div class="ls" id="ckl"></div></div></div>
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+
+<script>
+/* ═══ 演示数据（全部虚构/公开信息，无个人数据）═══ */
+const BRIEF = [
+  {t:'具身智能', items:[['37','AGCO 计划 2027 年起在堪萨斯农机工厂试点部署人形机器人'],['30','Generative Bionics 在意大利启动 Physical AI 数据工厂'],['27','NVIDIA 扩展 Cosmos 世界模型平台工具链']]},
+  {t:'AI 办公', items:[['35','Google Workspace 每周回顾：Gemini 深度接入表格与文档'],['28','开源 Agent 框架发布长任务编排能力']]},
+  {t:'模型与论文', items:[['34','Kimi K3.1 Pro 上线推理平台：1M 上下文开放权重'],['31','arXiv：视觉-语言-动作模型在未见任务上的泛化研究']]},
+  {t:'政策与融资', items:[['29','国务院办公厅印发 AI 就业友好型发展方式意见']]},
+];
+const QUEUE = [
+  {t:'评审选题：AGCO 农机工厂将试点 Agility Digit 人形机器人', m:['P1','选题','2026-10-24'], a:'批准选题', src:'https://www.therobotreport.com/'},
+  {t:'评审选题：NVIDIA Cosmos 世界模型平台扩展训练与部署工具链', m:['P2','选题','2026-10-23'], a:'批准选题', src:'https://blogs.nvidia.com/'},
+  {t:'审稿：《机床边的下一班》——具身智能的交付之年（终稿）', m:['P1','审稿','门禁全过'], a:'进审稿'},
+  {t:'核验证据快照：船厂焊接专题 3 条声明', m:['P2','证据链','2/3 已快照'], a:'去处理'},
+];
+const ORDERS = [
+  {id:'CO-20261024-003', title:'《机床边的下一班》——具身智能的交付之年', stage:'待审', line:'社会观察', plat:['公众号'], gates:{A:['事实核验',1,'7/7 声明已挂证据'],B:['口径一致性',1,'与内容线一致'],C:['语言审查',1,'v0 启发式通过'],D:['发布检查',1,'标题与平台齐备']},
+    hist:['候选 · 10-24 10:14','已批准 · 10-24 10:14','资料中 · 10-24 10:15','草稿中 · 10-24 10:15','门禁中 · 10-24 10:16','待审 · 10-24 10:16'],
+    claims:[['IEEE Spectrum：人形机器人迫切需要停止拍摄视频、去找一份工作','spectrum.ieee.org',1],['AGCO 计划 2027 年起试点部署 Agility Digit','therobotreport.com',1],['Generative Bionics 启动意大利 Physical AI 数据工厂','therobotreport.com',1],['NVIDIA 扩展 Cosmos 世界模型平台','blogs.nvidia.com',1],['国务院办公厅印发 AI 就业友好型发展方式意见','mee.gov.cn',1]],
+    station:['写作 / 审稿工位','绑定：写作阶段SOP · humanizer 反模式规则 · 内容模板 · 账号口吻 profile']},
+  {id:'CO-20261024-002', title:'Kimi K3.1 Pro 发布：开源权重模型的分水岭', stage:'草稿中', line:'AI 办公', plat:['公众号','知乎'], gates:null,
+    hist:['候选 · 10-24 10:18','已批准 · 10-24 10:32'], claims:[['Moonshot 官方博客：K3.1 Pro 发布与开放权重时间表','kimi.ai',1],['Vercel AI Gateway 上架记录','vercel.com',0]], station:['写作工位','绑定：写作阶段SOP · 内容模板 · 事实声明清单']},
+  {id:'CO-20261023-011', title:'具身智能数据工厂：另一种「卖铲人」', stage:'已发布', line:'社会观察', plat:['公众号','知乎'], gates:{A:['事实核验',1,'5/5 已挂证据'],B:['口径一致性',1,'—'],C:['语言审查',1,'—'],D:['发布检查',1,'—']},
+    hist:['候选 · 10-23 09:00','已批准 · 10-23 09:05','资料中 · 10-23 09:10','草稿中 · 10-23 09:30','门禁中 · 10-23 10:00','待审 · 10-23 10:02','待发 · 10-23 11:00','已发布 · 10-23 11:30'],
+    claims:[['Generative Bionics 数据工厂报道','therobotreport.com',1]], station:['复盘工位','绑定：数据复盘SOP · 回测脚本']},
+];
+const CANDS = [
+  {t:'图灵奖得主称：机器人基础模型将在三年内进入工厂产线', s:82, src:'机器人行业周刊'},
+  {t:'某协作机械臂厂商发布亚毫米级视觉抓取方案', s:64, src:'机器视觉前沿'},
+  {t:'通用人形机器人完成首例跨厂区多任务连续值班', s:77, src:'科技日报'},
+];
+const NAVS = [['今日行动','home','v-home'],['内容生产','orders','v-orders'],['情报研究','intel','v-intel']];
+const STAGES = ['候选','已批准','资料中','草稿中','门禁中','待审','待发','已发布','复盘中','已归档'];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ICONS = {home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  orders:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  intel:'<path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M2.29 9.62a10 10 0 1 0 19.02-1.27"/><path d="M16.24 7.76a6 6 0 1 0-8.01 8.91"/><circle cx="12" cy="12" r="1"/>'};
+const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+
+/* ═══ 渲染 ═══ */
+document.getElementById('nav').innerHTML = NAVS.map(([n,ic,v],i) =>
+  `<button class="${i===0?'on':''}" data-v="${v}" onclick="go('${v}',this)">${svg(ICONS[ic])}${n}</button>`).join('');
+function go(v, btn){
+  document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === 'v-' + v));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b === btn));
+  if (v === 'v-orders') renderOrders();
+}
+function renderBrief(){
+  document.getElementById('brief').innerHTML = BRIEF.map(s =>
+    `<div class="brief-sec"><h4>${s.t}</h4>${s.items.map(([sc,tx]) => `<div class="brief-item"><b>${sc}</b><span>${tx}</span></div>`).join('')}</div>`).join('');
+}
+function renderQueue(){
+  document.getElementById('queue').innerHTML = QUEUE.map(q =>
+    `<div class="qcard"><div class="qmeta"><span class="badge">${q.m[0]}</span><span>${q.m[1]}</span><span>${q.m[2]}</span></div>
+     <div class="qtitle">${q.t}</div>${q.src ? `<div class="qdesc">来源：<a href="${q.src}" target="_blank" rel="noopener">原文 ↗</a></div>` : ''}
+     <div class="qacts"><button class="btn pri" onclick="toast('演示：真实系统里这一步会写入状态机并留痕')">${q.a}</button><button class="btn" onclick="toast('演示动作')">稍后</button></div></div>`).join('');
+}
+let orderFilter = null;
+function renderOrders(){
+  const counts = {}; STAGES.forEach(s => counts[s] = 0);
+  ORDERS.forEach(o => counts[o.stage]++);
+  document.getElementById('pills').innerHTML = STAGES.filter(s => counts[s]).map(s =>
+    `<span class="pill${orderFilter === s ? ' on' : ''}" onclick="of('${s}')">${s} <b>${counts[s]}</b></span>`).join('');
+  const list = orderFilter ? ORDERS.filter(o => o.stage === orderFilter) : ORDERS;
+  document.getElementById('orders').innerHTML = list.length ? list.map(o => `
+    <div class="qcard" onclick="orderDetail('${o.id}')">
+      <div class="qmeta"><span class="badge">${o.stage}</span><span>${o.id}</span><span>${o.line}</span>
+        ${o.gates ? '<span class="badge ok">门禁可过</span>' : '<span class="badge warn">未过门禁</span>'}</div>
+      <div class="qtitle">${o.title}</div>
+      <div>${o.plat.map(p => `<span class="chip" style="padding:2px 9px;font-size:11px">${p}${o.stage === '已发布' ? ' ✓' : ''}</span>`).join(' ')}</div>
+      <div class="qacts"><button class="btn pri" onclick="event.stopPropagation();orderDetail('${o.id}')">详情 / 证据链</button>
+        ${o.stage === '草稿中' ? '<button class="btn" onclick="event.stopPropagation();toast(\'演示：配置 LLM 后一键按证据链生成草稿包\')">✎ 生成草稿</button>' : ''}</div>
+    </div>`).join('') : '<div class="qdesc">该阶段暂无内容单</div>';
+}
+function of(s){ orderFilter = orderFilter === s ? null : s; renderOrders(); }
+function renderCands(){
+  document.getElementById('cands').innerHTML = CANDS.map((c, i) =>
+    `<div class="cand" id="c${i}"><div class="qtitle">${c.t}</div>
+     <div class="qmeta"><span class="badge">${c.src}</span><span>评分 ${c.s}</span></div>
+     <div class="qacts"><button class="btn pri" onclick="approve(${i})">批准（自动建内容单）</button><button class="btn" onclick="reject(${i})">忽略</button></div></div>`).join('');
+}
+function approve(i){ const el = document.getElementById('c' + i); el.classList.add('cout');
+  el.querySelector('.qacts').innerHTML = '<span class="badge ok">已批准 → 内容单已自动建立（演示）</span>'; toast('真实系统：update_research_candidate 触发自动建单'); }
+function reject(i){ document.getElementById('c' + i).classList.add('cout'); }
+function orderDetail(id){
+  const o = ORDERS.find(x => x.id === id);
+  const g = o.gates;
+  document.getElementById('dlgBody').innerHTML = `
+    <h3>${esc(o.title)}</h3>
+    <div class="qmeta" style="margin-bottom:10px"><span class="badge">${o.stage}</span><span>${o.id}</span><span>${o.line}</span></div>
+    <div style="font-size:12px;color:var(--ink-3);font-weight:600;margin-bottom:4px">阶段轨迹</div>
+    <div class="tl">${o.hist.map(h => `<div class="s">${h}</div>`).join('')}</div>
+    <div style="font-size:12px;color:var(--ink-3);font-weight:600;margin-bottom:4px">事实声明与证据（A 段 · ${o.claims.length} 条）</div>
+    ${o.claims.map(c => `<div class="claim"><span>${esc(c[0])}</span><span class="ev"><a href="javascript:void 0" onclick="toast('真实系统：这里存有正文快照，链接失效也能追溯')">证据 ↗</a>${c[2] ? ' 📎' : ''}</span></div>`).join('')}
+    ${g ? `<div class="gates">${'ABCD'.split('').map((k, i) => `<div class="gate pass"><b>${k} ${g[k][0]}</b>通过 · ${g[k][2]}</div>`).join('')}</div>` : '<div class="qdesc" style="margin:10px 0">门禁：尚未提交（草稿中）</div>'}
+    <div class="station"><b>当前工位</b> · ${o.station[0]}<br>${esc(o.station[1])}</div>
+    <div style="text-align:right"><button class="btn pri" onclick="document.getElementById('dlg').close()">关闭</button></div>`;
+  document.getElementById('dlg').showModal();
+}
+function toast(msg){
+  let t = document.getElementById('toast');
+  if (!t){ t = document.createElement('div'); t.id = 'toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12.5px;padding:9px 16px;border-radius:10px;z-index:99;transition:opacity .3s'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => t.style.opacity = 0, 2600);
+}
+/* ⌘K */
+const CK = {
+  items: [], sel: 0,
+  build(){ this.items = [
+    {l:'今日行动 · 行动队列', k:'导航', f:() => go('v-home', document.querySelectorAll('.nav button')[0])},
+    {l:'内容生产 · 内容单流水线', k:'导航', f:() => go('v-orders', document.querySelectorAll('.nav button')[1])},
+    {l:'情报研究 · 选题评审', k:'导航', f:() => go('v-intel', document.querySelectorAll('.nav button')[2])},
+    {l:'同步数据', k:'动作', f:() => toast('演示：sync.py --once 同步 86 个分级信源')},
+    {l:'新建内容单', k:'动作', f:() => { go('v-orders', document.querySelectorAll('.nav button')[1]); toast('演示：手工建单'); }},
+    {l:'待审 · 《机床边的下一班》', k:'内容单', f:() => orderDetail('CO-20261024-003')},
+    {l:'草稿中 · Kimi K3.1 Pro 分水岭', k:'内容单', f:() => orderDetail('CO-20261024-002')},
+    {l:'设置 · 低频工具 · 快捷键', k:'动作', f:() => toast('演示：低频工具都收在这里')},
+  ]; this.sel = 0; },
+  open(force){ const el = document.getElementById('ck');
+    const on = force !== undefined ? force : !el.classList.contains('open');
+    if (on){ this.build(); el.classList.add('open'); const i = document.getElementById('cki'); i.value = ''; this.render(); setTimeout(() => i.focus(), 0); }
+    else el.classList.remove('open'); },
+  render(){ const q = document.getElementById('cki').value.toLowerCase();
+    this.filtered = this.items.filter(x => !q || (x.l + x.k).toLowerCase().includes(q));
+    this.sel = Math.min(this.sel, Math.max(0, this.filtered.length - 1));
+    document.getElementById('ckl').innerHTML = this.filtered.map((x, i) =>
+      `<div class="ci${i === this.sel ? ' sel' : ''}" data-i="${i}"><span>${x.l}</span><span class="k">${x.k}</span></div>`).join('') || '<div class="ci">没有匹配</div>'; },
+  run(i){ const x = this.filtered[i]; if (!x) return; this.open(false); x.f(); }
+};
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); CK.open(); return; }
+  if (!document.getElementById('ck').classList.contains('open')) return;
+  if (e.key === 'Escape') CK.open(false);
+  else if (e.key === 'ArrowDown'){ e.preventDefault(); CK.sel = Math.min(CK.sel + 1, CK.filtered.length - 1); CK.render(); }
+  else if (e.key === 'ArrowUp'){ e.preventDefault(); CK.sel = Math.max(CK.sel - 1, 0); CK.render(); }
+  else if (e.key === 'Enter'){ e.preventDefault(); CK.run(CK.sel); }
+});
+document.addEventListener('click', e => {
+  const it = e.target.closest('.ci'); if (it){ CK.run(Number(it.dataset.i)); return; }
+});
+document.getElementById('cki').addEventListener('input', () => { CK.sel = 0; CK.render(); });
+renderBrief(); renderQueue(); renderCands(); renderOrders();
+</script>
+</body>
+</html>
