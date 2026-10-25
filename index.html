@@ -77,6 +77,11 @@ a{color:var(--accent-ink)}
 .co-platform{font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--ink-3)}
 .co-platform.done{border-color:transparent;background:rgba(47,125,92,.1);color:var(--success)}
 .co-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.co-dialog{border:1px solid var(--line);border-radius:16px;padding:20px 22px;max-width:560px;width:calc(100vw - 48px);box-shadow:0 12px 48px rgba(32,42,48,.18)}
+.co-dialog::backdrop{background:rgba(32,42,48,.32)}
+.co-claim{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;line-height:1.5}
+.co-claim:last-child{border:none}
+.co-claim .ev{white-space:nowrap;font-size:12px;color:var(--accent-ink)}
 /* 卡片（队列/内容单/候选 统一质感）*/
 .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
 .qcard,.cand{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px;box-shadow:none;transition:all .16s ease-out;cursor:pointer}
@@ -140,6 +145,16 @@ dialog::backdrop{background:rgba(32,42,48,.35)}
 .fcluster{font-size:12px;color:var(--accent);margin-top:4px}
 .hotside{border-left:1px solid var(--line-soft);padding-left:20px}
 .hot-title{font-size:12px;font-weight:650;color:var(--ink-4);letter-spacing:.1em;margin-bottom:10px}
+.fmeta{font-size:12px;color:var(--ink-4)}
+.srcrow{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:12.5px;border-bottom:1px solid var(--line-soft)}
+.srcrow:last-child{border:none}
+.srcrow .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.srcrow .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srcrow .st{font-size:11px;color:var(--ink-4);font-variant-numeric:tabular-nums}
+.bars{display:flex;align-items:flex-end;gap:3px;height:56px}
+.bars .bar{flex:1;background:var(--accent-soft);border-radius:3px 3px 0 0;position:relative;min-height:3px}
+.bars .bar:hover{background:var(--accent)}
+.legend{display:flex;justify-content:space-between;font-size:10.5px;color:var(--ink-4);margin-top:4px}
 .hrow{display:flex;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;line-height:1.45}
 .hrow b{font-family:ui-monospace,Menlo,monospace;flex:none;width:14px}
 .hrow span{flex:1;color:var(--ink-2)}
@@ -217,7 +232,13 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
           <div id="feed"></div>
         </div>
         <aside class="hotside">
-          <div class="hot-title">当前热点</div>
+          <div class="hot-title">来源状态</div>
+          <div class="fmeta" style="margin-bottom:8px" id="srcHealthHint"></div>
+          <div id="srcList"></div>
+          <div class="hot-title" style="margin-top:18px">近 14 天新增</div>
+          <div class="bars" id="trendBars"></div>
+          <div class="legend"><span>较早</span><span>最近</span></div>
+          <div class="hot-title" style="margin-top:18px">当前热点</div>
           <div id="hotrank"></div>
         </aside>
       </div>
@@ -234,6 +255,17 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
       <div id="studio"></div>
     </section>
     <section class="view" id="v-intel">
+      <div class="vtitle" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span>往期稿件 <span style="font-weight:400;font-size:12.5px;color:var(--ink-4)">公众号 · 小红书 · 按阅读排序 · 复盘归因的数据底座</span></span>
+        <button class="btn" onclick="toast('演示：导入平台导出 CSV → 影子预览 → 确认写入')">导入平台数据</button>
+      </div>
+      <div class="pills" id="artPlats"></div>
+      <div id="artTotals" style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap"></div>
+      <div id="artList" style="display:grid;gap:8px;margin-bottom:26px"></div>
+      <div class="vtitle" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span>平台数据仪表盘</span>
+        <button class="btn" onclick="toast('演示：媒体合作与报价监测在真实系统的 media 页')">媒体合作 ↗</button>
+      </div>
       <div class="pills" id="platChips"></div>
       <div class="stats3" id="platStats"></div>
       <div class="card" style="padding:14px 16px;margin-bottom:12px"><svg id="spark" viewBox="0 0 560 120" style="width:100%;height:120px"></svg></div>
@@ -257,7 +289,7 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
 
 <script>
 /* ═══ 演示数据 ═══ */
-const NAVS = [['情报','home','v-home'],['创作','orders','v-orders'],['数据','intel','v-intel']];
+const NAVS = [['情报','home','v-home'],['创作','orders','v-orders'],['运营','intel','v-intel']];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ICONS = {home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
   orders:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
@@ -359,8 +391,37 @@ function go(v, btn){
   document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === v));
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b === btn));
   if (v === 'v-orders') { renderCoPipeline(); renderCoOrders(); renderStudio(); }
-  if (v === 'v-intel') renderPlat();
+  if (v === 'v-intel') { renderArticles(); renderPlat(); }
   toggleSide(false);
+}
+/* —— 情报栏：来源状态 + 14 天趋势（对齐真实情报页 IA，mock 数据）—— */
+const DEMO_SOURCES = [
+  ['Physical Intelligence', 'T1 · 官网直连', 'ok'], ['Figure AI', 'T1 · 官网直连', 'ok'],
+  ['Agility Robotics', 'T1 · 官网直连', 'ok'], ['宇树科技', 'T1 · 官网直连', 'ok'],
+  ['Anthropic News', 'T1 · 官网直连', 'ok'], ['Cursor Blog', 'T1 · 官网直连', 'ok'],
+  ['LangChain Blog', 'T1 · 官网直连', 'ok'], ['Cohere Blog', 'T1 · 官网直连', 'ok'],
+  ['The Robot Report', 'T2 · RSS', 'ok'], ['arXiv robotics', 'T1 · RSS', 'ok'],
+  ['VentureBeat AI', 'T2 · RSS', 'warn'], ['KDnuggets', 'T2 · RSS', 'warn'],
+];
+function renderSrcHealth(){
+  const hint = document.getElementById('srcHealthHint');
+  const list = document.getElementById('srcList');
+  if (!hint || !list) return;
+  const warn = DEMO_SOURCES.filter(s => s[2] !== 'ok');
+  hint.textContent = warn.length
+    ? `${warn.length} 个源需要关注：${DEMO_SOURCES.filter(s => s[2] === 'failed').length} 个失败，${warn.length} 个退避/警告`
+    : '当前启用源均无解析警告';
+  const shown = warn.concat(DEMO_SOURCES.filter(s => s[2] === 'ok')).slice(0, 8);
+  list.innerHTML = shown.map(([nm, tier, st]) =>
+    `<div class="srcrow"><span class="dot" style="background:${st === 'ok' ? 'var(--success)' : st === 'warn' ? 'var(--warning)' : 'var(--danger)'}"></span><span class="nm">${nm}</span><span class="st">${tier}</span></div>`).join('')
+    + `<div class="fmeta" style="padding:6px 0 0">共 12 个源 · 50 直连可用 · 429/403 自动退避（演示收敛为 12）</div>`;
+}
+function renderTrendBars(){
+  const el = document.getElementById('trendBars');
+  if (!el) return;
+  const counts = [18, 24, 31, 22, 28, 35, 41, 30, 26, 33, 29, 38, 44, 52];
+  const max = Math.max(...counts);
+  el.innerHTML = counts.map(c => `<div class="bar" style="height:${Math.max(3, Math.round(c / max * 100))}%" title="${c} 条"></div>`).join('');
 }
 /* —— 情报 feed —— */
 let feedCat = '全部';
@@ -419,6 +480,37 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2200);
 }
+/* —— 往期稿件（对齐真实系统运营栏：双平台汇总 + 阅读排序，mock）—— */
+const DEMO_ARTICLES = [
+  ['《机床边的下一班》', '公众号', '10-23', 4216, 312, true],
+  ['具身智能的交付之年', '知乎', '10-23', 3405, 267, true],
+  ['开放权重的分水岭', '公众号', '10-19', 3102, 208, true],
+  ['开放权重的分水岭', '知乎', '10-20', 2516, 154, true],
+  ['AI 办公的真瓶颈', '公众号', '10-15', 2845, 176, false],
+  ['具身智能数据工厂', '公众号', '10-11', 2317, 143, false],
+  ['协作机器人安全设计', '知乎', '10-14', 1662, 98, false],
+  ['世界模型是什么', '知乎', '10-08', 1337, 76, false],
+];
+let artPlat = '全部';
+function renderArticles(){
+  const chips = document.getElementById('artPlats');
+  if (!chips) return;
+  chips.innerHTML = ['全部', ...new Set(DEMO_ARTICLES.map(a => a[1]))].map(p =>
+    `<span class="pill${artPlat === p ? ' on' : ''}" onclick="artPlat='${p}';renderArticles()">${p}</span>`).join('');
+  const rows = DEMO_ARTICLES.filter(a => artPlat === '全部' || a[1] === artPlat)
+    .sort((a, b) => b[3] - a[3]);
+  const total = rows.reduce((s, a) => s + a[3], 0);
+  const inter = rows.reduce((s, a) => s + a[4], 0);
+  document.getElementById('artTotals').innerHTML = [
+    ['稿件数', rows.length + ' 篇'], ['总阅读', total.toLocaleString()], ['总互动', inter.toLocaleString()],
+  ].map(x => `<div class="stat3"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  document.getElementById('artList').innerHTML = rows.map(a =>
+    `<div class="qcard" style="cursor:default"><div class="qmeta">${a[1]} · ${a[2]}${a[5] ? ' · <b>已进复盘归因</b>' : ''}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        <div class="qtitle" style="flex:1">${a[0]}</div>
+        <span class="fmeta" style="font-variant-numeric:tabular-nums">阅读 ${a[3].toLocaleString()} · 互动 ${a[4]}</span>
+      </div></div>`).join('');
+}
 /* —— 内容单流水线（对齐真实系统）—— */
 function renderCoPipeline(){
   const counts = {}; CO_STAGES.forEach(s => counts[s] = 0);
@@ -443,7 +535,7 @@ function renderCoOrders(){
       <div class="qmeta" style="margin:4px 0 0">${plats} · ${o.human}</div>
       <div class="co-actions">
         ${next[0] ? `<button class="btn pri" onclick="coAdvance(${i},'${next[0]}')">${next[1]}</button>` : ''}
-        <button class="btn" onclick="toast('演示：阶段轨迹 / 证据链 / 门禁结果 / 工位卡')">详情 · 证据链</button>
+        <button class="btn" onclick="coDemoDetail(${i})">详情 · 证据链</button>
         <button class="btn" onclick="toast('演示：每条对外事实挂证据后才能过 A 段')">＋ 挂事实声明</button>
       </div>
     </div>`;
@@ -522,7 +614,60 @@ function renderStudio(){
       ${['A 事实核验','B 口径一致','C 语言审查','D 发布检查'].map(g => `<div class="gate pass"><b>${g[0]}</b>通过</div>`).join('')}
     </div>
     <div class="qdesc" style="margin:0 0 14px">四段门禁全过 → 待发布（真实系统中发布永远由人执行）</div>
+    <div class="station" style="margin-bottom:14px"><b>试试门禁的牙齿</b> · 真实系统里，无证据的事实声明过不了 A 段，发布接口直接返回 409——不是提示文案，是系统行为：
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="demoGate409()">无证据点发布 → 看 409</button>
+        <button class="btn" onclick="toast('演示：补挂证据后 A 段通过，才进入待发布')">补挂证据后发布</button>
+      </div>
+    </div>
     <div class="snav"><button class="btn" onclick="prevStep()">← 封面</button><button class="btn pri" onclick="toast('已加入待发布 · 三个必经人工点：批准/审稿/发布')">完成 · 待发布</button></div>`;
+}
+/* 内容单详情弹层（demo）：阶段轨迹 + 证据链 + 门禁——对齐真实系统 coDetail */
+function coDemoDetail(i){
+  const o = CO_ORDERS[i];
+  const claims = [
+    ['AGCO 将于 2027 年试点部署 Agility Digit', 'therobotreport.com', true, true],
+    ['国内首批百台交付落地 CNC 车间', '极客公园', true, true],
+    ['IEEE Spectrum：「别再拍视频，去找份工作」', 'spectrum.ieee.org', true, true],
+    ['某厂商良率提升 40%', '', false, false],
+  ];
+  const dlg = document.createElement('dialog');
+  dlg.className = 'co-dialog';
+  dlg.innerHTML = `<h3 style="margin:0 0 4px;font-size:15px">${esc(o.title)}</h3>
+    <div class="co-meta"><span class="co-badge">${o.stage}</span><span>${o.id}</span><span>${o.line}</span></div>
+    <div style="display:grid;gap:14px;margin-top:12px;font-size:12.5px">
+      <div><b style="font-size:13px">阶段轨迹</b>（只归档不删除，全程留痕）
+        <div class="fmeta" style="margin-top:4px;line-height:1.8">候选 10-24 09:12 → 已批准 10-24 09:40（人工点 1）→ 资料中 → 草稿中 → 门禁中 → 待审（等人工点 2）</div></div>
+      <div><b style="font-size:13px">事实声明与证据（A 段）—— ${claims.length} 条，<span style="color:var(--danger)">1 条缺证据</span></b>
+        <div style="margin-top:4px">${claims.map(c => `<div class="co-claim"><span>${c[0]}</span><span class="ev">${c[1] ? `证据 ↗` : '<span style="color:var(--danger)">缺证据</span>'}${c[3] ? ' 📎 已快照' : ''}</span></div>`).join('')}</div></div>
+      <div><b style="font-size:13px">最近门禁结果</b>
+        <div class="fmeta" style="margin-top:4px;line-height:1.8">A 事实核验：<b style="color:var(--danger)">未过</b>（1 条缺证据）· B 口径：<b style="color:var(--success)">通过</b> · C 语言：<b style="color:var(--success)">通过</b> · D 发布检查：<b style="color:var(--danger)">未过</b></div></div>
+      <div class="qdesc">证据快照 = 抓取时固化的正文（防链接失效/被改）；每条对外事实可溯源到知识库或快照，无证据无法过 A 段。</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn" onclick="toast('演示：补挂证据 → 重跑门禁预检');this.closest('dialog').close()">补挂证据</button>
+      <button class="btn pri" onclick="this.closest('dialog').close()">关闭</button>
+    </div>`;
+  document.body.appendChild(dlg); dlg.showModal();
+  dlg.addEventListener('close', () => dlg.remove());
+}
+/* 门禁 409 可玩切片（demo）：模拟真实系统 POST /transition {action:"publish"} 的 409 响应 */
+function demoGate409(){
+  const dlg = document.createElement('dialog');
+  dlg.className = 'co-dialog';
+  dlg.innerHTML = `<h3 style="margin:0 0 4px;font-size:15px">发布被系统拦下</h3>
+    <div class="co-meta"><span class="co-badge gate-bad">HTTP 409</span><span>gate_check: publishable=false</span></div>
+    <div style="font-size:13px;line-height:1.9;margin-top:10px">
+      <div><b>A 事实核验 · 未过</b>——声明「国内首批百台交付落地 CNC 车间」缺少 http(s) 证据链接。每条对外事实必须挂证据，检索结果绝不直接进稿。</div>
+      <div style="margin-top:6px"><b>D 发布检查 · 未过</b>——证据链不齐时发布前置不满足。</div>
+      <div class="qdesc" style="margin-top:10px">真实系统行为：按钮不会变灰，但点击后接口返回 409 并附门禁详情——「门禁是系统行为，不是自觉」。补挂证据 → 重跑预检 → A/D 全过才放行。</div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="btn" onclick="toast('演示：已挂证据，A 段通过');this.closest('dialog').close()">去补证据</button>
+      <button class="btn pri" onclick="this.closest('dialog').close()">知道了</button>
+    </div>`;
+  document.body.appendChild(dlg); dlg.showModal();
+  dlg.addEventListener('close', () => dlg.remove());
 }
 function pickTopic(i){ studio.topic = i; renderStudio(); }
 function nextStep(){ studio.step = Math.min(4, studio.step+1); renderStudio(); }
@@ -547,14 +692,14 @@ function renderPlat(){
     d.rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
 }
 try { if (localStorage.getItem('zento_side') === 'narrow') document.querySelector('.shell').classList.add('narrow'); } catch(_){}
-renderFeed(); renderHot(); renderStudio(); renderPlat();
+renderFeed(); renderHot(); renderSrcHealth(); renderTrendBars(); renderArticles(); renderStudio(); renderPlat();
 
 const CK = {
   items: [], sel: 0,
   build(){ this.items = [
     {l:'情报 · 热点聚合', k:'导航', f:() => go('v-home', document.querySelectorAll('.nav button')[0])},
     {l:'创作 · 一站式工作台', k:'导航', f:() => go('v-orders', document.querySelectorAll('.nav button')[1])},
-    {l:'数据 · 平台后台', k:'导航', f:() => go('v-intel', document.querySelectorAll('.nav button')[2])},
+    {l:'运营 · 稿件与平台数据', k:'导航', f:() => go('v-intel', document.querySelectorAll('.nav button')[2])},
     {l:'同步数据', k:'动作', f:() => toast('演示：sync.py --once 同步 86 个分级信源')},
     {l:'新建内容单', k:'动作', f:() => { go('v-orders', document.querySelectorAll('.nav button')[1]); toast('演示：手工建单'); }},
     {l:'待审 · 《机床边的下一班》', k:'内容单', f:() => orderDetail('CO-20261024-003')},
@@ -587,7 +732,6 @@ document.addEventListener('click', e => {
 });
 document.getElementById('cki').addEventListener('input', () => { CK.sel = 0; CK.render(); });
 try { if (localStorage.getItem('zento_side') === 'narrow') document.querySelector('.shell').classList.add('narrow'); } catch(_){}
-renderFeed(); renderHot();
 </script>
 </body>
 </html>
