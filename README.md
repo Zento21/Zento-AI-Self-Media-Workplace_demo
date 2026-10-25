@@ -1,10 +1,10 @@
-# Zento AI自媒体工作台（交互演示）
+# Zento AI 自媒体工作台（交互演示）
 
 > 挂在简历上的公开演示。**全部为演示数据**，不含任何个人运营数据；真实系统是本地优先的 Flask + SQLite 应用（私有仓库）。
 
 ## 在线体验
 
-GitHub Pages 部署后访问：`https://<用户名>.github.io/<仓库名>/`
+**https://zento21.github.io/Zento-AI-Self-Media-Workplace_demo/**
 
 **可以玩的部分**：
 
@@ -21,15 +21,16 @@ GitHub Pages 部署后访问：`https://<用户名>.github.io/<仓库名>/`
 |---|---|
 | AI 写作的事实可靠性 | 证据链强制：每条对外事实挂证据链接 + 正文快照，A 段门禁机器预检 |
 | 内容质量的系统性保障 | 四段发布门禁（事实/口径/语言/发布），不过则发布接口 409 |
-| 信息过载 | 86 个分级信源（T1/T1.5/T2），评分改动必须过人工标注评估集回测 |
+| 信息过载 | 86 个分级信源（T1/T1.5/T2）+ 事件聚类；评分改动必须过人工标注评估集回测 |
 | 每日信息消化成本 | 零 LLM 日报：入库时分类完成，分桶排序秒级生成 |
+| AI 生成能力 | LLM 双通道：套餐端点（Anthropic 报文）与 OpenAI 兼容端点按 URL 自动识别，草稿生成真实可用 |
 | 效率 | ⌘K 命令面板 + 三个必经人工点（批准/审稿/发布），其余全自动 |
 | 数据主权 | 本地优先：Flask + SQLite 全在本机，127.0.0.1，永不自动发布 |
 
 ## 技术栈
 
 Python 3.12（Flask / Waitress）· SQLite（30+ 表）· 零依赖单文件前端（冻结设计 tokens）·
-307 项回归测试 · launchd/计划任务自动备份与只读恢复演练
+333 项回归测试 · 每日备份与只读恢复演练 · Lighthouse 可访问性 100 × 3 屏
 
 ## 仓库结构（本演示仓库）
 
@@ -40,5 +41,5 @@ index.html   自包含交互演示（无构建、无依赖、无外部请求）
 ## 私有主仓库
 
 真实系统代码在私有仓库（含个人运营数据）。核心模块：`server.py`（Flask API）、
-`workplace_db.py`（数据层与状态机）、`sync.py`（情报引擎）、`daily_brief.py`（零 LLM 日报）、
-`test_workplace.py`（307 项回归）。
+`workplace_db.py`（数据层与状态机）、`sync.py`（情报引擎）、`drafting.py`（LLM 双通道草稿生成）、
+`daily_brief.py`（零 LLM 日报）、`test_workplace.py`（333 项回归）。
