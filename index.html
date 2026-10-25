@@ -110,6 +110,47 @@ dialog::backdrop{background:rgba(32,42,48,.35)}
 .ci.sel{background:var(--accent-soft)}
 .ci .k{margin-left:auto;font-size:11px;color:var(--ink-4);border:1px solid var(--line);border-radius:999px;padding:1px 8px;flex:none}
 /* 真实系统（应用下方，窄幅）*/
+/* —— 情报 feed —— */
+.feedwrap{display:grid;grid-template-columns:1fr 240px;gap:24px}
+.fday{font-size:13px;font-weight:650;color:var(--ink-3);margin:6px 0 10px;display:flex;gap:8px;align-items:baseline}
+.fday span{font-weight:400;font-size:12px;color:var(--ink-4)}
+.fitem{border-left:2px solid var(--line);padding:2px 0 14px 16px;position:relative;cursor:pointer}
+.fitem::before{content:'';position:absolute;left:-5px;top:10px;width:8px;height:8px;border-radius:50%;background:var(--surface);border:2px solid var(--line)}
+.fitem:hover::before{border-color:var(--accent)}
+.fmeta{font-size:12px;color:var(--ink-4);margin-bottom:3px}
+.fmeta b{color:var(--accent-ink);font-weight:600}
+.ftitle{font-size:15px;font-weight:650;line-height:1.5;display:flex;gap:8px;align-items:baseline}
+.ftitle .badge{flex:none;transform:translateY(-1px)}
+.fsum{font-size:13px;color:var(--ink-3);margin-top:3px;line-height:1.55}
+.fcluster{font-size:12px;color:var(--accent);margin-top:4px}
+.hotside{border-left:1px solid var(--line-soft);padding-left:20px}
+.hot-title{font-size:12px;font-weight:650;color:var(--ink-4);letter-spacing:.1em;margin-bottom:10px}
+.hrow{display:flex;gap:8px;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px;line-height:1.45}
+.hrow b{font-family:ui-monospace,Menlo,monospace;flex:none;width:14px}
+.hrow span{flex:1;color:var(--ink-2)}
+.hrow em{font-style:normal;font-family:ui-monospace,Menlo,monospace;color:var(--danger);font-size:11px}
+.hrow i{font-style:normal;font-family:ui-monospace,Menlo,monospace;color:var(--ink-4);font-size:11px}
+/* —— 创作工作台 —— */
+.steps{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.step{font-size:12.5px;padding:5px 13px;border-radius:999px;border:1px solid var(--line);color:var(--ink-3);cursor:pointer;background:var(--surface)}
+.step.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.step.done{border-color:transparent;background:var(--accent-soft);color:var(--accent-ink)}
+.snav{display:flex;justify-content:space-between;margin-top:18px}
+.draft{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:22px 26px;font-size:14.5px;line-height:1.8;max-width:640px}
+.pubview{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:28px 30px;max-width:480px}
+.pubview h1{font-size:21px;margin:0 0 6px}
+.pmeta{font-size:12px;color:var(--ink-4);margin-bottom:14px}
+.pubview p{font-size:14px;line-height:1.9;margin:0 0 12px;color:var(--ink-2)}
+/* —— 数据 —— */
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 12px}
+.stat3{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:14px 18px}
+.stat3 b{font-size:24px;font-weight:700;display:block;font-variant-numeric:tabular-nums}
+.stat3 span{font-size:12px;color:var(--ink-4)}
+.stat3 em{font-style:normal;color:var(--success)}
+.dtable{width:100%;border-collapse:collapse;font-size:13px;min-width:420px}
+.dtable th{text-align:left;font-weight:600;color:var(--ink-4);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.dtable td{padding:9px 10px;border-bottom:1px solid var(--line-soft)}
+@media(max-width:860px){.feedwrap{grid-template-columns:1fr}.hotside{border:none;padding-left:0}.stats3{grid-template-columns:1fr}}
 .real{max-width:860px;margin:56px auto 0;padding:0 20px}
 .real .lbl{font-size:12px;font-weight:650;color:var(--ink-4);letter-spacing:.14em;margin-bottom:10px}
 .real img{width:100%;display:block;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
@@ -155,19 +196,27 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
       <button class="mbtn" onclick="CK.open(true)" aria-label="命令面板"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 9 13.5 12 9 15"/><path d="M20 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1z"/></svg></button>
     </div>
     <section class="view on" id="v-home">
-      <h2 class="vtitle">今日简报</h2>
-      <div class="brief-grid" id="brief"></div>
-      <h2 class="vtitle">行动队列</h2>
-      <div class="qgrid" id="queue"></div>
+      <div class="feedwrap">
+        <div>
+          <div class="pills" id="feedCats"></div>
+          <div id="feed"></div>
+        </div>
+        <aside class="hotside">
+          <div class="hot-title">当前热点</div>
+          <div id="hotrank"></div>
+        </aside>
+      </div>
     </section>
     <section class="view" id="v-orders">
-      <h2 class="vtitle">内容单流水线</h2>
-      <div class="pills" id="pills"></div>
-      <div class="qgrid" id="orders"></div>
+      <div class="steps" id="steps"></div>
+      <div id="studio"></div>
     </section>
     <section class="view" id="v-intel">
-      <h2 class="vtitle">选题评审</h2>
-      <div id="cands"></div>
+      <div class="pills" id="platChips"></div>
+      <div class="stats3" id="platStats"></div>
+      <div class="card" style="padding:14px 16px;margin-bottom:12px"><svg id="spark" viewBox="0 0 560 120" style="width:100%;height:120px"></svg></div>
+      <div style="overflow-x:auto"><table class="dtable" id="dtable"></table></div>
+      <div class="qdesc" style="margin-top:10px">数据来自平台后台导出 · 本地处理</div>
     </section>
   </main>
 </div>
@@ -185,130 +234,235 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 
 <script>
-/* ═══ 演示数据（全部虚构/公开信息，无个人数据）═══ */
-const BRIEF = [
-  {t:'具身智能', items:[['37','AGCO 计划 2027 年起在堪萨斯农机工厂试点部署人形机器人'],['30','Generative Bionics 在意大利启动 Physical AI 数据工厂'],['27','NVIDIA 扩展 Cosmos 世界模型平台工具链']]},
-  {t:'AI 办公', items:[['35','Google Workspace 每周回顾：Gemini 深度接入表格与文档'],['28','开源 Agent 框架发布长任务编排能力']]},
-  {t:'模型与论文', items:[['34','Kimi K3.1 Pro 上线推理平台：1M 上下文开放权重'],['31','arXiv：视觉-语言-动作模型在未见任务上的泛化研究']]},
-  {t:'政策与融资', items:[['29','国务院办公厅印发 AI 就业友好型发展方式意见']]},
-];
-const QUEUE = [
-  {t:'评审选题：AGCO 农机工厂将试点 Agility Digit 人形机器人', m:['P1','选题','2026-10-24'], a:'批准选题', src:'https://www.therobotreport.com/'},
-  {t:'评审选题：NVIDIA Cosmos 世界模型平台扩展训练与部署工具链', m:['P2','选题','2026-10-23'], a:'批准选题', src:'https://blogs.nvidia.com/'},
-  {t:'审稿：《机床边的下一班》——具身智能的交付之年（终稿）', m:['P1','审稿','门禁全过'], a:'进审稿'},
-  {t:'核验证据快照：船厂焊接专题 3 条声明', m:['P2','证据链','2/3 已快照'], a:'去处理'},
-];
-const ORDERS = [
-  {id:'CO-20261024-003', title:'《机床边的下一班》——具身智能的交付之年', stage:'待审', line:'社会观察', plat:['公众号'], gates:{A:['事实核验',1,'7/7 声明已挂证据'],B:['口径一致性',1,'与内容线一致'],C:['语言审查',1,'v0 启发式通过'],D:['发布检查',1,'标题与平台齐备']},
-    hist:['候选 · 10-24 10:14','已批准 · 10-24 10:14','资料中 · 10-24 10:15','草稿中 · 10-24 10:15','门禁中 · 10-24 10:16','待审 · 10-24 10:16'],
-    claims:[['IEEE Spectrum：人形机器人迫切需要停止拍摄视频、去找一份工作','spectrum.ieee.org',1],['AGCO 计划 2027 年起试点部署 Agility Digit','therobotreport.com',1],['Generative Bionics 启动意大利 Physical AI 数据工厂','therobotreport.com',1],['NVIDIA 扩展 Cosmos 世界模型平台','blogs.nvidia.com',1],['国务院办公厅印发 AI 就业友好型发展方式意见','mee.gov.cn',1]],
-    station:['写作 / 审稿工位','绑定：写作阶段SOP · humanizer 反模式规则 · 内容模板 · 账号口吻 profile']},
-  {id:'CO-20261024-002', title:'Kimi K3.1 Pro 发布：开源权重模型的分水岭', stage:'草稿中', line:'AI 办公', plat:['公众号','知乎'], gates:null,
-    hist:['候选 · 10-24 10:18','已批准 · 10-24 10:32'], claims:[['Moonshot 官方博客：K3.1 Pro 发布与开放权重时间表','kimi.ai',1],['Vercel AI Gateway 上架记录','vercel.com',0]], station:['写作工位','绑定：写作阶段SOP · 内容模板 · 事实声明清单']},
-  {id:'CO-20261023-011', title:'具身智能数据工厂：另一种「卖铲人」', stage:'已发布', line:'社会观察', plat:['公众号','知乎'], gates:{A:['事实核验',1,'5/5 已挂证据'],B:['口径一致性',1,'—'],C:['语言审查',1,'—'],D:['发布检查',1,'—']},
-    hist:['候选 · 10-23 09:00','已批准 · 10-23 09:05','资料中 · 10-23 09:10','草稿中 · 10-23 09:30','门禁中 · 10-23 10:00','待审 · 10-23 10:02','待发 · 10-23 11:00','已发布 · 10-23 11:30'],
-    claims:[['Generative Bionics 数据工厂报道','therobotreport.com',1]], station:['复盘工位','绑定：数据复盘SOP · 回测脚本']},
-];
-const CANDS = [
-  {t:'图灵奖得主称：机器人基础模型将在三年内进入工厂产线', s:82, src:'机器人行业周刊'},
-  {t:'某协作机械臂厂商发布亚毫米级视觉抓取方案', s:64, src:'机器视觉前沿'},
-  {t:'通用人形机器人完成首例跨厂区多任务连续值班', s:77, src:'科技日报'},
-];
-const NAVS = [['今日行动','home','v-home'],['内容生产','orders','v-orders'],['情报研究','intel','v-intel']];
-const STAGES = ['候选','已批准','资料中','草稿中','门禁中','待审','待发','已发布','复盘中','已归档'];
+/* ═══ 演示数据 ═══ */
+const NAVS = [['情报','home','v-home'],['创作','orders','v-orders'],['数据','intel','v-intel']];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ICONS = {home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
-  orders:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  orders:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
   intel:'<path d="M19.07 4.93A10 10 0 0 0 6.99 3.34"/><path d="M2.29 9.62a10 10 0 1 0 19.02-1.27"/><path d="M16.24 7.76a6 6 0 1 0-8.01 8.91"/><circle cx="12" cy="12" r="1"/>'};
 const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
 
-/* ═══ 渲染 ═══ */
-document.getElementById('nav').innerHTML = NAVS.map(([n,ic,v],i) =>
-  `<button class="${i===0?'on':''}" data-v="${v}" onclick="go('${v}',this)">${svg(ICONS[ic])}${n}</button>`).join('');
+const CATS = ['全部','一手','具身智能','AI办公','模型','行业','论文','政策'];
+const FEED = [
+  {d:'今天', s:82, t:'通用人形机器人完成跨厂区多任务连续值班', src:'The Robot Report', tier:'一手', c:'具身智能', cluster:4,
+   sum:'单台机器人在两座厂区间完成上下料、巡检与转运的连续值班，首次验证跨场景任务迁移的工程可行性。'},
+  {d:'今天', s:77, t:'NVIDIA Cosmos 世界模型平台扩展训练与部署工具链', src:'NVIDIA Blog', tier:'一手', c:'模型', cluster:0,
+   sum:'物理 AI 开发者可在仿真环境中完成训练、评估到部署的完整链路，部署周期显著缩短。'},
+  {d:'今天', s:75, t:'Kimi K3.1 Pro 开放权重正式释出', src:'Moonshot AI', tier:'一手', c:'模型', cluster:13,
+   sum:'3T 级开放权重模型上线，1M 上下文，API 价格较上代大幅下调。'},
+  {d:'今天', s:71, t:'国务院办公厅印发 AI 就业友好型发展方式意见', src:'中国政府网', tier:'一手', c:'政策', cluster:2,
+   sum:'六方面十八项任务：增强就业创造效应、减缓替代影响、建立失业缓冲机制。'},
+  {d:'今天', s:68, t:'Google Workspace 周报：Gemini 深度接入表格与文档', src:'Google', tier:'一手', c:'AI办公', cluster:0,
+   sum:'表格自然语言查询、文档自动摘要向全量用户开放。'},
+  {d:'今天', s:64, t:'协作机械臂发布亚毫米级视觉抓取方案', src:'机器视觉前沿', tier:'媒体', c:'具身智能', cluster:0,
+   sum:'乱序工件免预分拣抓取，换型时间压缩到分钟级。'},
+  {d:'今天', s:58, t:'arXiv：视觉-语言-动作模型在未见任务上的泛化研究', src:'arXiv', tier:'一手', c:'论文', cluster:0,
+   sum:'提出分层策略蒸馏方法，未见物体操作成功率提升 17 个百分点。'},
+  {d:'昨天', s:80, t:'AGCO 将于 2027 年在堪萨斯农机工厂试点 Agility Digit', src:'The Robot Report', tier:'一手', c:'具身智能', cluster:7,
+   sum:'传统农机制造商首次把人形机器人写入产能规划，被视为行业风向标。'},
+  {d:'昨天', s:66, t:'Generative Bionics 在意大利启动 Physical AI 数据工厂', src:'The Robot Report', tier:'媒体', c:'具身智能', cluster:0,
+   sum:'训练数据本土化生成，瞄准欧洲机器人主权。'},
+  {d:'昨天', s:61, t:'开源 Agent 框架发布长任务编排能力', src:'GitHub Trending', tier:'社区', c:'AI办公', cluster:0,
+   sum:'跨会话任务状态持久化与失败自动恢复，复杂工作流稳定性提升。'},
+  {d:'昨天', s:55, t:'某大厂裁撤 AI 伦理团队引争议', src:'科技媒体', tier:'媒体', c:'行业', cluster:3,
+   sum:'业内担忧安全投入与模型能力扩张失衡。'},
+];
+const HOT = [
+  ['通用人形机器人完成跨厂区连续值班','+72','566'],
+  ['Kimi K3.1 Pro 开放权重释出','+40','421'],
+  ['AGCO 2027 试点 Agility Digit','+28','208'],
+  ['国务院印发 AI 就业友好意见','+21','166'],
+  ['NVIDIA Cosmos 工具链扩展','+15','124'],
+];
+const TOPICS = [
+  {t:'具身智能的交付之年：从讲故事到拼量产', s:82, line:'社会观察', claims:[
+    ['AGCO 将于 2027 年试点部署 Agility Digit','therobotreport.com',1],
+    ['国内首批百台交付落地 CNC 车间','极客公园',1],
+    ['IEEE Spectrum：「别再拍视频，去找份工作」','spectrum.ieee.org',1]]},
+  {t:'AI 办公的真正瓶颈：工具太多，流程没变', s:75, line:'AI办公', claims:[
+    ['Google Workspace 将 Gemini 接入表格文档','workspace.googleblog.com',1],
+    ['开源 Agent 框架支持长任务编排','github.com',0]]},
+  {t:'开放权重的分水岭：K3.1 Pro 之后', s:71, line:'模型', claims:[
+    ['Moonshot 官方：开放权重时间表与定价','kimi.ai',1],
+    ['推理平台上架记录与实测跑分','vercel.com',1]]},
+];
+const DRAFT = {title:'具身智能的交付之年', body:[
+  '今年具身智能行业最安静的变化，不是又一款机器人的参数纪录，而是竞争的计量单位变了。',
+  '从讲故事到拼交付，换的不只是话术，是计量单位：行业开始用台、工位、班次，而不是播放量与估值，来自我证明。',
+  '机床边的场景对机器人提出的验收标准始终是四条：认得出零件、顶得住连轴转、换厂还灵、算得过账。',
+  '下一班已经开始了。']};
+const COVERS = [
+  ['#1D8F92','#0F4A4B'],['#B3402A','#5C1A10'],['#2F7D5C','#123528'],['#B8873A','#4A3410'],
+];
+let coverIdx = 0;
+let studio = {topic: 0, step: 0};
+let platCur = '公众号';
+const PLATS = {
+  '公众号': {reads:'12,480', grow:'+8.3%', fans:'316', inter:'5.2%', trend:[3,5,4,7,6,9,8,11,10,13,12,15,14,17],
+    rows:[['《机床边的下一班》','10-23','4,216','312'],['开放权重的分水岭','10-19','3,102','208'],['AI 办公的真瓶颈','10-15','2,845','176'],['具身智能数据工厂','10-11','2,317','143']]},
+  '知乎': {reads:'8,920', grow:'+5.1%', fans:'189', inter:'6.8%', trend:[2,3,3,4,5,5,7,6,8,9,8,10,12,11],
+    rows:[['具身智能的交付之年','10-23','3,405','267'],['开放权重的分水岭','10-20','2,516','154'],['协作机器人安全设计','10-14','1,662','98'],['世界模型是什么','10-08','1,337','76']]},
+};
+
+/* —— 侧栏折叠 / 抽屉 —— */
 function togglePanel(){
   if (matchMedia('(max-width:860px)').matches) { toggleSide(true); return; }
   const sh = document.querySelector('.shell');
   sh.classList.toggle('narrow');
   try { localStorage.setItem('zento_side', sh.classList.contains('narrow') ? 'narrow' : ''); } catch(_){}
 }
-function toggleSide(on){document.querySelector('.side').classList.toggle('open', on);document.getElementById('scrim').classList.toggle('on', on);}
+function toggleSide(on){
+  document.querySelector('.side').classList.toggle('open', on);
+  document.getElementById('scrim').classList.toggle('on', on);
+}
+
+/* ═══ 渲染 ═══ */
+document.getElementById('nav').innerHTML = NAVS.map(([n,ic,v],i) =>
+  `<button class="${i===0?'on':''}" data-v="${v}" onclick="go('${v}',this)">${svg(ICONS[ic])}${n}</button>`).join('');
 function go(v, btn){
-  toggleSide(false);
   document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === v));
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b === btn));
-  if (v === 'v-orders') renderOrders();
+  if (v === 'v-orders') renderStudio();
+  if (v === 'v-intel') renderPlat();
+  toggleSide(false);
 }
-function renderBrief(){
-  document.getElementById('brief').innerHTML = BRIEF.map(s =>
-    `<div class="brief-sec"><h4>${s.t}</h4>${s.items.map(([sc,tx]) => `<div class="brief-item"><b>${sc}</b><span>${tx}</span></div>`).join('')}</div>`).join('');
+/* —— 情报 feed —— */
+let feedCat = '全部';
+function renderFeed(){
+  document.getElementById('feedCats').innerHTML = CATS.map(c =>
+    `<span class="pill${feedCat===c?' on':''}" onclick="setCat('${c}')">${c}</span>`).join('');
+  const items = FEED.filter(x => feedCat==='全部' || x.c===feedCat || (feedCat==='一手'&&x.tier==='一手'));
+  const days = [...new Set(items.map(x => x.d))];
+  document.getElementById('feed').innerHTML = days.map(d => `
+    <div class="fday">${d} <span>· ${items.filter(x=>x.d===d).length} 条</span></div>
+    ${items.filter(x=>x.d===d).map(x => `
+      <div class="fitem" onclick="feedOpen(${FEED.indexOf(x)})">
+        <div class="fmeta"><b>${x.tier}</b> · ${x.src} · ${x.c}</div>
+        <div class="ftitle"><span class="badge">${x.s}</span>${x.t}</div>
+        <div class="fsum">${x.sum}</div>
+        ${x.cluster ? `<div class="fcluster">另有 ${x.cluster} 家报道 →</div>` : ''}
+      </div>`).join('')}`).join('');
 }
-function renderQueue(){
-  document.getElementById('queue').innerHTML = QUEUE.map(q =>
-    `<div class="qcard"><div class="qmeta">${q.m.join(' · ')}</div>
-     <div class="qtitle">${q.t}</div>${q.src ? `<div class="qdesc"><a href="${q.src}" target="_blank" rel="noopener">原文 ↗</a></div>` : ''}
-     <div class="qacts"><button class="btn pri" onclick="toast('演示：真实系统里这一步会写入状态机并留痕')">${q.a}</button><button class="txt" onclick="snoozeCard(this)">稍后</button></div></div>`).join('');
-}
-let orderFilter = null;
-function renderOrders(){
-  const counts = {}; STAGES.forEach(s => counts[s] = 0);
-  ORDERS.forEach(o => counts[o.stage]++);
-  document.getElementById('pills').innerHTML = STAGES.filter(s => counts[s]).map(s =>
-    `<span class="pill${orderFilter === s ? ' on' : ''}" onclick="of('${s}')">${s} <b>${counts[s]}</b></span>`).join('');
-  const list = orderFilter ? ORDERS.filter(o => o.stage === orderFilter) : ORDERS;
-  document.getElementById('orders').innerHTML = list.length ? list.map(o => `
-    <div class="qcard" onclick="orderDetail('${o.id}')">
-      <div class="qmeta">${o.stage === '已发布' ? '✓ ' : ''}${o.stage} · ${o.id}${o.gates ? '' : ' · 未过门禁'}</div>
-      <div class="qtitle">${o.title}</div>
-      <div class="qdesc">${o.plat.join(' · ')} · ${o.claims.length} 条证据</div>
-      <div class="qacts"><button class="btn pri" onclick="event.stopPropagation();orderDetail('${o.id}')">详情</button>
-        ${o.stage === '草稿中' ? '<button class="txt" onclick="event.stopPropagation();toast(\'演示：配置 LLM 后一键按证据链生成草稿包\')">生成草稿</button>' : ''}</div>
-    </div>`).join('') : '<div class="qdesc">该阶段暂无内容单</div>';
-}
-function of(s){ orderFilter = orderFilter === s ? null : s; renderOrders(); }
-function renderCands(){
-  document.getElementById('cands').innerHTML = CANDS.map((c, i) =>
-    `<div class="cand" id="c${i}"><div class="qmeta">${c.src} · 今日</div>
-     <div style="display:flex;gap:12px;align-items:baseline;justify-content:space-between">
-       <div class="qtitle" style="flex:1">${c.t}</div><span class="badge" style="flex:none">${c.s}</span></div>
-     <div class="qacts"><button class="btn pri" onclick="approve(${i})">批准</button><button class="txt" onclick="reject(${i})">忽略</button></div></div>`).join('');
-}
-function approve(i){ const el = document.getElementById('c' + i); el.classList.add('cout');
-  el.querySelector('.qacts').innerHTML = '<span class="badge ok">已批准 → 内容单已自动建立（演示）</span>'; toast('真实系统：update_research_candidate 触发自动建单'); }
-function reject(i){ document.getElementById('c' + i).classList.add('cout'); }
-function orderDetail(id){
-  const o = ORDERS.find(x => x.id === id);
-  const g = o.gates;
+function setCat(c){ feedCat = c; renderFeed(); }
+function feedOpen(i){
+  const x = FEED[i];
   document.getElementById('dlgBody').innerHTML = `
-    <h3>${esc(o.title)}</h3>
-    <div class="qmeta" style="margin-bottom:10px"><span class="badge">${o.stage}</span><span>${o.id}</span><span>${o.line}</span></div>
-    <div style="font-size:12px;color:var(--ink-3);font-weight:600;margin-bottom:4px">阶段轨迹</div>
-    <div class="tl">${o.hist.map(h => `<div class="s">${h}</div>`).join('')}</div>
-    <div style="font-size:12px;color:var(--ink-3);font-weight:600;margin-bottom:4px">事实声明与证据（A 段 · ${o.claims.length} 条）</div>
-    ${o.claims.map(c => `<div class="claim"><span>${esc(c[0])}</span><span class="ev"><a href="javascript:void 0" onclick="toast('真实系统：这里存有正文快照，链接失效也能追溯')">证据 ↗</a>${c[2] ? ' 📎' : ''}</span></div>`).join('')}
-    ${g ? `<div class="gates">${'ABCD'.split('').map((k, i) => `<div class="gate pass"><b>${k} ${g[k][0]}</b>通过 · ${g[k][2]}</div>`).join('')}</div>` : '<div class="qdesc" style="margin:10px 0">门禁：尚未提交（草稿中）</div>'}
-    <div class="station"><b>当前工位</b> · ${o.station[0]}<br>${esc(o.station[1])}</div>
-    <div style="text-align:right"><button class="btn pri" onclick="document.getElementById('dlg').close()">关闭</button></div>`;
+    <h3>${x.t}</h3>
+    <div class="qmeta" style="margin-bottom:10px">${x.tier} · ${x.src} · ${x.c} · 评分 ${x.s}</div>
+    <div class="qdesc" style="margin-bottom:14px">${x.sum}</div>
+    <div class="station"><b>证据快照</b><br>· ${x.src} 正文已抓取（${(x.s*137)%900+300} 字）<br>· 分类与摘要入库时完成，零 LLM</div>
+    <div style="text-align:right;display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn" onclick="document.getElementById('dlg').close()">关闭</button>
+      <button class="btn pri" onclick="document.getElementById('dlg').close();toStudio()">去创作 →</button>
+    </div>`;
   document.getElementById('dlg').showModal();
 }
-function snoozeCard(btn){
-  const card = btn.closest('.qcard');
-  card.style.transition = 'opacity .25s ease-out, transform .25s ease-out';
-  card.style.opacity = '0'; card.style.transform = 'translateX(12px)';
-  setTimeout(() => card.remove(), 260);
+function renderHot(){
+  const R = ['#B3402A','#A3642F','#96702E','#657176','#657176'];
+  document.getElementById('hotrank').innerHTML = HOT.map((h,i) => `
+    <div class="hrow"><b style="color:${R[i]}">${i+1}</b><span>${h[0]}</span>
+    <em>+${h[1].replace('+','')}</em><i>${h[2]}</i></div>`).join('');
 }
-function toast(msg){
-  let t = document.getElementById('toast');
-  if (!t){ t = document.createElement('div'); t.id = 'toast';
-    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12.5px;padding:9px 16px;border-radius:10px;z-index:99;transition:opacity .3s'; document.body.appendChild(t); }
-  t.textContent = msg; t.style.opacity = 1; clearTimeout(t._h); t._h = setTimeout(() => t.style.opacity = 0, 2600);
+function toStudio(){
+  studio.step = 0;
+  go('v-orders', document.querySelectorAll('.nav button')[1]);
 }
-/* ⌘K */
+/* —— 创作工作台 —— */
+const STEPS = ['选题','证据','草稿','封面','排版'];
+function renderStudio(){
+  const t = TOPICS[studio.topic];
+  document.getElementById('steps').innerHTML = STEPS.map((s,i) => `
+    <span class="step${i===studio.step?' on':''}${i<studio.step?' done':''}" onclick="jumpStep(${i})">${i+1} ${s}</span>`).join('');
+  const el = document.getElementById('studio');
+  if (studio.step === 0) el.innerHTML = `
+    <div class="qdesc" style="margin-bottom:12px">批准一条选题，开始创作（也可从情报页「去创作」带入）</div>
+    ${TOPICS.map((tp,i) => `
+      <div class="cand" style="cursor:pointer;${i===studio.topic?'border-color:var(--accent)':''}" onclick="pickTopic(${i})">
+        <div class="qmeta">${tp.line} · 评分 ${tp.s}</div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+          <div class="qtitle" style="flex:1">${tp.t}</div>
+          ${i===studio.topic?'<span class="badge">已选中</span>':''}
+        </div>
+      </div>`).join('')}
+    <div class="snav"><span></span><button class="btn pri" onclick="nextStep()">下一步 · 证据 →</button></div>`;
+  else if (studio.step === 1) el.innerHTML = `
+    <div class="qdesc" style="margin-bottom:12px">每条对外事实必须挂证据（A 段门禁），快照防链接失效</div>
+    ${t.claims.map(c => `
+      <div class="claim"><span>${c[0]}</span>
+        <span class="ev"><a href="javascript:void 0" onclick="toast('演示：真实系统存有正文快照')">证据 ↗</a>${c[2]?' 📎':''}</span></div>`).join('')}
+    <div class="station" style="margin-top:14px"><b>证据工位</b> · 绑定 lit-verify（学术引用核验）与证据快照抓取</div>
+    <div class="snav"><button class="btn" onclick="prevStep()">← 选题</button><button class="btn pri" onclick="nextStep()">下一步 · 草稿 →</button></div>`;
+  else if (studio.step === 2) {
+    const words = DRAFT.body.join('').length;
+    el.innerHTML = `
+    <div class="draft">
+      <h2 style="margin:0 0 12px;font-size:19px">${DRAFT.title}</h2>
+      ${DRAFT.body.map(p => `<p style="margin:0 0 12px">${p}</p>`).join('')}
+    </div>
+    <div class="qdesc" style="margin-top:10px">正文 ${words} 字 · 只引用已挂证据的事实 · 判断句已标注观点</div>
+    <div class="station" style="margin-top:12px"><b>写作工位</b> · 绑定写作 SOP + humanizer 反模式规则 + 账号口吻 profile</div>
+    <div class="snav"><button class="btn" onclick="prevStep()">← 证据</button><button class="btn pri" onclick="nextStep()">下一步 · 封面 →</button></div>`;
+  } else if (studio.step === 3) {
+    const c = COVERS[coverIdx % COVERS.length];
+    el.innerHTML = `
+    <div class="qdesc" style="margin-bottom:12px">封面由冻结 tokens 与标题自动生成 · 零外部依赖</div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+      <svg width="480" height="270" viewBox="0 0 480 270" style="max-width:100%;border-radius:12px;box-shadow:var(--shadow-hover)">
+        <defs><linearGradient id="cv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset="1" stop-color="${c[1]}"/></linearGradient></defs>
+        <rect width="480" height="270" fill="url(#cv)"/>
+        <text x="36" y="150" fill="#FDFDFB" font-size="${DRAFT.title.length>12?30:36}" font-weight="700" font-family="inherit">${DRAFT.title.slice(0,10)}</text>
+        <text x="36" y="196" fill="rgba(253,253,251,.75)" font-size="17">Zento AI · ${t.line}</text>
+        <path d="M36 60 h28 l-28 24 h28" fill="none" stroke="#FDFDFB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <button class="btn" onclick="coverIdx++;renderStudio()">换一版配色</button>
+        <div class="qdesc" style="margin-top:10px;max-width:200px">同一篇内容只用一套 token；方向在 tokens.json 冻结，不即兴。</div>
+      </div>
+    </div>
+    <div class="station" style="margin-top:14px"><b>视觉工位</b> · 绑定小黑配图 / zine 海报 / 冻结 tokens</div>
+    <div class="snav"><button class="btn" onclick="prevStep()">← 草稿</button><button class="btn pri" onclick="nextStep()">下一步 · 排版 →</button></div>`;
+  } else el.innerHTML = `
+    <div class="pubview"><h1>${DRAFT.title}</h1>
+      <div class="pmeta">Zento · 约 3 分钟</div>
+      ${DRAFT.body.map(p => `<p>${p}</p>`).join('')}
+    </div>
+    <div class="gates" style="margin-top:16px">
+      ${['A 事实核验','B 口径一致','C 语言审查','D 发布检查'].map(g => `<div class="gate pass"><b>${g[0]}</b>通过</div>`).join('')}
+    </div>
+    <div class="qdesc" style="margin:0 0 14px">四段门禁全过 → 待发布（真实系统中发布永远由人执行）</div>
+    <div class="snav"><button class="btn" onclick="prevStep()">← 封面</button><button class="btn pri" onclick="toast('已加入待发布 · 三个必经人工点：批准/审稿/发布')">完成 · 待发布</button></div>`;
+}
+function pickTopic(i){ studio.topic = i; renderStudio(); }
+function nextStep(){ studio.step = Math.min(4, studio.step+1); renderStudio(); }
+function prevStep(){ studio.step = Math.max(0, studio.step-1); renderStudio(); }
+function jumpStep(i){ studio.step = i; renderStudio(); }
+/* —— 数据 —— */
+function renderPlat(){
+  document.getElementById('platChips').innerHTML = Object.keys(PLATS).map(p =>
+    `<span class="pill${platCur===p?' on':''}" onclick="platCur='${p}';renderPlat()">${p}</span>`).join('');
+  const d = PLATS[platCur];
+  document.getElementById('platStats').innerHTML = [
+    ['总阅读', d.reads, d.grow], ['新关注', d.fans, '+12%'], ['互动率', d.inter, '+0.4pt']
+  ].map(x => `<div class="stat3"><b>${x[1]}</b><span>${x[0]} <em>${x[2]}</em></span></div>`).join('');
+  const W=560, H=120, max=Math.max(...d.trend);
+  const pts = d.trend.map((v,i) => `${(i/(d.trend.length-1))*W},${H-8-(v/max)*(H-24)}`).join(' ');
+  document.getElementById('spark').innerHTML =
+    `<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` +
+    d.trend.map((v,i) => `<circle cx="${(i/(d.trend.length-1))*W}" cy="${H-8-(v/max)*(H-24)}" r="2.5" fill="var(--accent)"/>`).join('') +
+    `<text x="4" y="14" font-size="11" fill="#657176">近 14 天阅读趋势</text>`;
+  document.getElementById('dtable').innerHTML =
+    `<tr><th>内容</th><th>发布</th><th>阅读</th><th>互动</th></tr>` +
+    d.rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+}
+try { if (localStorage.getItem('zento_side') === 'narrow') document.querySelector('.shell').classList.add('narrow'); } catch(_){}
+renderFeed(); renderHot(); renderStudio(); renderPlat();
+
 const CK = {
   items: [], sel: 0,
   build(){ this.items = [
-    {l:'今日行动 · 行动队列', k:'导航', f:() => go('v-home', document.querySelectorAll('.nav button')[0])},
-    {l:'内容生产 · 内容单流水线', k:'导航', f:() => go('v-orders', document.querySelectorAll('.nav button')[1])},
-    {l:'情报研究 · 选题评审', k:'导航', f:() => go('v-intel', document.querySelectorAll('.nav button')[2])},
+    {l:'情报 · 热点聚合', k:'导航', f:() => go('v-home', document.querySelectorAll('.nav button')[0])},
+    {l:'创作 · 一站式工作台', k:'导航', f:() => go('v-orders', document.querySelectorAll('.nav button')[1])},
+    {l:'数据 · 平台后台', k:'导航', f:() => go('v-intel', document.querySelectorAll('.nav button')[2])},
     {l:'同步数据', k:'动作', f:() => toast('演示：sync.py --once 同步 86 个分级信源')},
     {l:'新建内容单', k:'动作', f:() => { go('v-orders', document.querySelectorAll('.nav button')[1]); toast('演示：手工建单'); }},
     {l:'待审 · 《机床边的下一班》', k:'内容单', f:() => orderDetail('CO-20261024-003')},
