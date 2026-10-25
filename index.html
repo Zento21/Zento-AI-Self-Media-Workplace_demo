@@ -62,6 +62,21 @@ a{color:var(--accent-ink)}
 .pill:hover{border-color:var(--accent);color:var(--accent-ink)}
 .pill.on{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink);font-weight:600}
 .pill b{font-family:ui-monospace,'SF Mono',Menlo,monospace}
+/* 内容单流水线（对齐真实系统 co-* 结构）*/
+.co-pipeline{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.co-stage{font-size:12px;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--ink-3);background:var(--surface);cursor:pointer;transition:all .16s ease-out}
+.co-stage:hover{border-color:var(--accent);color:var(--accent-ink)}
+.co-stage.on{background:var(--accent-soft);border-color:transparent;color:var(--accent-ink);font-weight:600}
+.co-stage b{font-family:ui-monospace,'SF Mono',Menlo,monospace;margin-left:2px}
+.co-card{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px;transition:all .16s ease-out}
+.co-card:hover{box-shadow:var(--shadow-hover)}
+.co-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-4);margin-bottom:5px}
+.co-badge{font-size:11.5px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:2px 9px}
+.co-badge.gate-ok{color:var(--success);background:rgba(47,125,92,.1)}
+.co-badge.gate-bad{color:var(--warning);background:rgba(184,135,58,.12)}
+.co-platform{font-size:11.5px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--ink-3)}
+.co-platform.done{border-color:transparent;background:rgba(47,125,92,.1);color:var(--success)}
+.co-actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
 /* 卡片（队列/内容单/候选 统一质感）*/
 .qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
 .qcard,.cand{background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;padding:12px 16px;box-shadow:none;transition:all .16s ease-out;cursor:pointer}
@@ -208,6 +223,13 @@ kbd{border:1px solid var(--line);border-radius:5px;padding:0 5px;font-size:11px;
       </div>
     </section>
     <section class="view" id="v-orders">
+      <div class="vtitle" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span>内容单流水线 <span style="font-weight:400;font-size:12.5px;color:var(--ink-4)">一条单贯穿 选题→撰写→发表 · 三个必经人工点</span></span>
+        <button class="btn" onclick="toast('演示：批准选题即自动建单')">＋ 新建内容单</button>
+      </div>
+      <div class="co-pipeline" id="coPipeline"></div>
+      <div id="coOrders" style="display:grid;gap:10px;margin-bottom:22px"></div>
+      <div class="vtitle" style="font-size:14px;color:var(--ink-3)">加工台 · 选中内容单的五步工位（选题 → 证据 → 草稿 → 封面 → 排版）</div>
       <div class="steps" id="steps"></div>
       <div id="studio"></div>
     </section>
@@ -294,6 +316,20 @@ const DRAFT = {title:'具身智能的交付之年', body:[
 const COVERS = [
   ['#1D8F92','#0F4A4B'],['#B3402A','#5C1A10'],['#2F7D5C','#123528'],['#B8873A','#4A3410'],
 ];
+/* 内容单演示数据（结构对齐真实系统：stage × 平台发布状态 × 门禁结果）*/
+const CO_STAGES = ['候选','已批准','资料中','草稿中','门禁中','待审','待发','已发布','复盘中','已归档'];
+const CO_NEXT = { 候选:['approve','批准选题'], 已批准:['start_research','开始收集资料'], 资料中:['start_draft','进入写作'],
+  草稿中:['submit_gate','提交门禁'], 门禁中:['gate_pass','通过门禁 → 待审'], 待审:['review_pass','审稿通过 → 待发'],
+  待发:['publish','点发布'], 已发布:['start_review','进入复盘'], 复盘中:['close','归档'], 归档:[null,''] };
+const CO_ORDERS = [
+  {id:'CO-20261024-003', stage:'待审', title:'《机床边的下一班》行业版：从讲故事到拼交付', line:'社会观察',
+   platforms:['公众号','小红书'], pubStatus:{}, gate:{ok:true}, human:'人工点 2 · 等审稿'},
+  {id:'CO-20261024-002', stage:'待审', title:'《机床边的下一班》v6 信源增强（至简动力叙事稿）', line:'社会观察',
+   platforms:['公众号'], pubStatus:{}, gate:{ok:true}, human:'人工点 2 · 等审稿'},
+  {id:'CO-20261024-001', stage:'已批准', title:'Kimi K3.1 Pro 发布：开源权重模型的分水岭', line:'模型',
+   platforms:['公众号','小红书'], pubStatus:{}, gate:{ok:null}, human:'下一步：收集资料'},
+];
+let coFilter = null;
 let coverIdx = 0;
 let studio = {topic: 0, step: 0};
 let platCur = '公众号';
@@ -322,7 +358,7 @@ document.getElementById('nav').innerHTML = NAVS.map(([n,ic,v],i) =>
 function go(v, btn){
   document.querySelectorAll('.view').forEach(x => x.classList.toggle('on', x.id === v));
   document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b === btn));
-  if (v === 'v-orders') renderStudio();
+  if (v === 'v-orders') { renderCoPipeline(); renderCoOrders(); renderStudio(); }
   if (v === 'v-intel') renderPlat();
   toggleSide(false);
 }
@@ -366,6 +402,62 @@ function renderHot(){
 function toStudio(){
   studio.step = 0;
   go('v-orders', document.querySelectorAll('.nav button')[1]);
+}
+/* —— 轻提示（原调用点从未定义，2026-10-25 审计补齐）—— */
+let toastTimer = null;
+function toast(msg){
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.setAttribute('role', 'status');
+    el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#FDFDFB;font-size:13px;padding:9px 18px;border-radius:999px;box-shadow:var(--shadow-hover);z-index:100;opacity:0;transition:opacity .16s ease-out;max-width:80vw;text-align:center;pointer-events:none';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2200);
+}
+/* —— 内容单流水线（对齐真实系统）—— */
+function renderCoPipeline(){
+  const counts = {}; CO_STAGES.forEach(s => counts[s] = 0);
+  CO_ORDERS.forEach(o => { if (counts[o.stage] !== undefined) counts[o.stage]++; });
+  document.getElementById('coPipeline').innerHTML = CO_STAGES.map(s =>
+    `<span class="co-stage${coFilter === s ? ' on' : ''}" onclick="coFilterSet('${s}')">${s}<b>${counts[s]}</b></span>`).join('');
+}
+function coFilterSet(s){ coFilter = (coFilter === s ? null : s); renderCoPipeline(); renderCoOrders(); }
+function renderCoOrders(){
+  const list = coFilter ? CO_ORDERS.filter(o => o.stage === coFilter) : CO_ORDERS;
+  const el = document.getElementById('coOrders');
+  if (!list.length) { el.innerHTML = '<div class="co-card" style="color:var(--ink-4)">该阶段暂无内容单</div>'; return; }
+  el.innerHTML = list.map((o, i) => {
+    const next = CO_NEXT[o.stage];
+    const gateBadge = o.gate.ok === true ? '<span class="co-badge gate-ok">门禁可发布</span>'
+      : o.gate.ok === false ? '<span class="co-badge gate-bad">门禁未过</span>' : '';
+    const plats = o.platforms.map(p =>
+      `<span class="co-platform${(o.pubStatus||{})[p] === '已发布' ? ' done' : ''}">${p}${(o.pubStatus||{})[p] === '已发布' ? ' ✓' : ''}</span>`).join(' ');
+    return `<div class="co-card">
+      <div class="co-meta"><span class="co-badge">${o.stage}</span><span>${o.line}</span><span>${o.id}</span>${gateBadge}</div>
+      <div class="qtitle">${esc(o.title)}</div>
+      <div class="qmeta" style="margin:4px 0 0">${plats} · ${o.human}</div>
+      <div class="co-actions">
+        ${next[0] ? `<button class="btn pri" onclick="coAdvance(${i},'${next[0]}')">${next[1]}</button>` : ''}
+        <button class="btn" onclick="toast('演示：阶段轨迹 / 证据链 / 门禁结果 / 工位卡')">详情 · 证据链</button>
+        <button class="btn" onclick="toast('演示：每条对外事实挂证据后才能过 A 段')">＋ 挂事实声明</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function coAdvance(i, action){
+  const o = CO_ORDERS[i];
+  const flow = {approve:'已批准', start_research:'资料中', start_draft:'草稿中', submit_gate:'门禁中',
+    gate_pass:'待审', review_pass:'待发', publish:'已发布', start_review:'复盘中', close:'已归档'};
+  const to = flow[action];
+  if (action === 'publish') { o.pubStatus = {[o.platforms[0]]: '已发布'}; toast('演示：已发布（真实系统永远由人点发布）'); }
+  else toast('演示：已流转 → ' + to);
+  if (to) o.stage = to;
+  renderCoPipeline(); renderCoOrders();
 }
 /* —— 创作工作台 —— */
 const STEPS = ['选题','证据','草稿','封面','排版'];
@@ -495,7 +587,7 @@ document.addEventListener('click', e => {
 });
 document.getElementById('cki').addEventListener('input', () => { CK.sel = 0; CK.render(); });
 try { if (localStorage.getItem('zento_side') === 'narrow') document.querySelector('.shell').classList.add('narrow'); } catch(_){}
-renderBrief(); renderQueue(); renderCands(); renderOrders();
+renderFeed(); renderHot();
 </script>
 </body>
 </html>
